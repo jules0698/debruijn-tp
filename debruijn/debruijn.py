@@ -24,14 +24,14 @@ random.seed(9001)
 from random import randint
 import statistics
 
-__author__ = "Your Name"
+__author__ = "Jules Collat"
 __copyright__ = "Universite Paris Diderot"
-__credits__ = ["Your Name"]
+__credits__ = ["Jules Collat]
 __license__ = "GPL"
 __version__ = "1.0.0"
-__maintainer__ = "Your Name"
-__email__ = "your@email.fr"
-__status__ = "Developpement"
+__maintainer__ = "Jules Collat"
+__email__ = "collatjule@eisti.eu"
+__status__ = "student"
 
 def isfile(path):
     """Check if path is an existing file.
@@ -66,20 +66,45 @@ def get_arguments():
 
 
 def read_fastq(fastq_file):
-    pass
+    with open(fastq_file,"rt") as fastqfile:
+        for line in fastqfile:
+            yield next(fastqfile).replace("\n","")
+            next(fastqfile)
+            next(fastqfile)
+
+
+    
 
 
 def cut_kmer(read, kmer_size):
-    pass
+    for c, valeur in enumerate(read):
+        if len(read[c:kmer_size+c]) == kmer_size:
+            yield (read[c:kmer_size+c])
+        
+    
 
 
 def build_kmer_dict(fastq_file, kmer_size):
-    pass
+    kmer_dict = dict()
+    sequences = read_fastq(fastq_file)
+    for sequence in sequences:
+        for kmer in cut_kmer(sequence, kmer_size):
+            if kmer not in kmer_dict.keys():
+                kmer_dict[kmer]=1
+            else:
+                kmer_dict[kmer]+=1
+    return kmer_dict
+    
+
 
 
 def build_graph(kmer_dict):
-    pass
+    tree = nx.DiGraph()
+    for kmer, weight in kmer_dict.items():
+        tree.add_edge(kmer[0:len(kmer)-1], kmer[1:len(kmer)], weight=weight)
+    return tree
 
+    
 
 def remove_paths(graph, path_list, delete_entry_node, delete_sink_node):
     pass
@@ -130,4 +155,8 @@ def main():
     args = get_arguments()
 
 if __name__ == '__main__':
+    tests = cut_kmer("ATGATAATGGG", 3)
+    for test in tests :
+        print(test)
+    
     main()
